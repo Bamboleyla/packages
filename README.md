@@ -1,1 +1,1 @@
-version: 0.0.1
+General packages for Terminal and Analize projects
