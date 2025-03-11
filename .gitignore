@@ -1,0 +1,11 @@
+# ide
+/.vscode
+
+# cash
+__pycache__/
+
+# venv
+/.venv
+
+# settings
+settings.py
