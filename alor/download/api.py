@@ -8,7 +8,7 @@ from datetime import datetime, timedelta, timezone
 import pandas as pd
 import websockets
 from dotenv import load_dotenv
-from .token import AlorToken
+from ..__token import AlorToken
 
 load_dotenv()
 
@@ -27,7 +27,7 @@ class AlorAPI:
         config = json.loads(os.getenv("ALOR"))  # Load configuration
 
         self.ws_url = config["websocket_url"]  # Get websocket url
-        self.access_token = token.get_access_token()["access_token"]  # Get access token
+        self.access_token = token.get_token()["access_token"]  # Get access token
 
     async def get_ticker_data(
         self, ticker: str, start_date: datetime, tf: int
