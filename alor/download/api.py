@@ -24,9 +24,8 @@ class AlorAPI:
 
     def __init__(self):
         token = AlorToken()  # Load token service
-        config = json.loads(os.getenv("ALOR"))  # Load configuration
 
-        self.ws_url = config["websocket_url"]  # Get websocket url
+        self.ws_url = os.getenv("ALOR_WEBSOCKET_URL")  # Get websocket url
         self.access_token = token.get_token()["access_token"]  # Get access token
 
     async def get_ticker_data(

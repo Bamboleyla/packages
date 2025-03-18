@@ -3,7 +3,7 @@
 from .download import AlorDownloader
 
 
-class Alor:
+class Broker:
     """This class represents an Alor broker."""
 
     def __init__(self):

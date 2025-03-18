@@ -1,5 +1,5 @@
 """Main module for Alor broker."""
 
-from .main import Alor
+from .main import Broker
 
-__all__ = ["Alor"]
+__all__ = ["Broker"]

@@ -13,11 +13,12 @@ Example usage:
         print("Failed to retrieve token.")
 """
 
-import json
 import logging
 import os
 from typing import Dict, Optional, Union
+import asyncio
 from dotenv import load_dotenv
+
 
 from .api import get_access_token
 
@@ -25,18 +26,16 @@ load_dotenv()
 
 logger = logging.getLogger("AlorToken")
 
-alor_config = json.loads(os.getenv("ALOR"))
-
 
 class AlorToken:
     """This class controls Alor tokens"""
 
     def get_token(self) -> Optional[Dict[str, Union[str, int]]]:
         """Get a JWT token from ALOR by using refresh token."""
-        if not alor_config.get("token") or not alor_config.get("url_oauth"):
+        if not os.getenv("ALOR_TOKEN") or not os.getenv("ALOR_URL_OAUTH"):
             logger.error("ALOR configuration is missing or incomplete.")
             return None
 
-        payload = {"token": alor_config["token"]}
+        payload = {"token": os.getenv("ALOR_TOKEN")}
 
-        return get_access_token(payload)
+        return asyncio.run(get_access_token(payload))

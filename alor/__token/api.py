@@ -1,6 +1,5 @@
 """This module provides functionality for managing Alor API tokens."""
 
-import json
 import logging
 import os
 from datetime import datetime
@@ -11,16 +10,12 @@ load_dotenv()
 
 logger = logging.getLogger("AlorToken")
 
-# Load configuration
-alor_config = json.loads(os.getenv("ALOR", "{}"))  # Added default value
-
 
 def get_access_token(payload):
     """This function sends a POST request to the ALOR OAuth endpoint to get an access token."""
+
     response = requests.post(
-        url=f"{alor_config['url_oauth']}/refresh",
-        data=payload,
-        timeout=5,
+        url=f"{os.getenv("ALOR_URL_OAUTH")}/refresh", data=payload, timeout=10
     )
     response.raise_for_status()  # Call httperror for 4xx/5xx statuses
 
