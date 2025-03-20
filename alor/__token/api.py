@@ -15,7 +15,7 @@ def get_access_token(payload):
     """This function sends a POST request to the ALOR OAuth endpoint to get an access token."""
 
     response = requests.post(
-        url=f"{os.getenv("ALOR_URL_OAUTH")}/refresh", data=payload, timeout=10
+        url=f"{os.getenv("ALOR_URL_OAUTH")}/refresh", params=payload, timeout=10
     )
     response.raise_for_status()  # Call httperror for 4xx/5xx statuses
 

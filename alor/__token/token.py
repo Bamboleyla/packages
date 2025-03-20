@@ -38,4 +38,4 @@ class AlorToken:
 
         payload = {"token": os.getenv("ALOR_TOKEN")}
 
-        return asyncio.run(get_access_token(payload))
+        return get_access_token(payload)
