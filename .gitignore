@@ -7,5 +7,12 @@ __pycache__/
 # venv
 /.venv
 
-# settings
-settings.py
+# config
+.env
+
+# data
+/tickers
+
+#build
+/build
+/packages.egg-info
