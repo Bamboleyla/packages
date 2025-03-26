@@ -12,3 +12,7 @@ __pycache__/
 
 # data
 /tickers
+
+#build
+/build
+/packages.egg-info

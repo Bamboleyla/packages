@@ -16,7 +16,6 @@ Example usage:
 import logging
 import os
 from typing import Dict, Optional, Union
-import asyncio
 from dotenv import load_dotenv
 
 
