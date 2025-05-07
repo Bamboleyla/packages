@@ -15,4 +15,4 @@ __pycache__/
 
 #build
 /build
-/packages.egg-info
+/myLib.egg-info
