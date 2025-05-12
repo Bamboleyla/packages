@@ -46,7 +46,7 @@ def sell_limit(
     - Removes the executed order from the active orders list
     """
 
-    if order["price"] <= row["HIGH"].iloc[0] and order["price"] >= row["LOW"].iloc[0]:
+    if order["price"] <= row["HIGH"] and order["price"] >= row["LOW"]:
         position.decrease(order["size"])
         log.loc[index, "SIGNAL"] = order["message"]
         log.loc[index, "SELL_PRICE"] = order["price"]

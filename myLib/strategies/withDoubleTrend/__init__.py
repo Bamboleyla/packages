@@ -7,7 +7,7 @@ from ..strategy import StrategyAbstractClass
 __all__ = ["WithDoubleTrend"]
 
 
-class SuperTrendParams(TypedDict):
+class SuperTrendParamsTypedDict(TypedDict):
     """
     A TypedDict class which contains the names of the columns with the values of the Supertrend
       indicators.
@@ -33,20 +33,18 @@ class SuperTrendParams(TypedDict):
         )
     """
 
-    fast_up: str
-    fast_down: str
-    slow_up: str
-    slow_down: str
+    var_take: float
+    indicators: dict[str, str]
 
 
 class WithDoubleTrend(StrategyAbstractClass):
-    def __init__(self, params: SuperTrendParams, broker: BrokerAbstractClass):
+    def __init__(self, params: SuperTrendParamsTypedDict, broker: BrokerAbstractClass):
         self.name = "WithDoubleTrend"
-        self.__var_take = 1.5
-        self.__fast_up = params["fast_up"]
-        self.__fast_down = params["fast_down"]
-        self.__slow_up = params["slow_up"]
-        self.__slow_down = params["slow_down"]
+        self.__var_take = params["var_take"]
+        self.__fast_up = params["indicators"]["fast_up"]
+        self.__fast_down = params["indicators"]["fast_down"]
+        self.__slow_up = params["indicators"]["slow_up"]
+        self.__slow_down = params["indicators"]["slow_down"]
         self.__broker = broker
 
     def run(self, previous: pd.DataFrame, current: pd.DataFrame) -> None:
@@ -94,14 +92,14 @@ class WithDoubleTrend(StrategyAbstractClass):
         """
 
         # We check the conditions at the previous bar (use .iloc [0] since only one line)
-        prev_close = previous["CLOSE"].iloc[0]
-        prev_fast_up = previous[self.__fast_up].iloc[0]
-        prev_slow_down = previous[self.__slow_down].iloc[0]
+        prev_close = previous["CLOSE"]
+        prev_fast_up = previous[self.__fast_up]
+        prev_slow_down = previous[self.__slow_down]
 
         # We check the conditions at the current bar
-        curr_open = current["OPEN"].iloc[0]
-        curr_fast_down = current[self.__fast_down].iloc[0]
-        curr_slow_down = current[self.__slow_down].iloc[0]
+        curr_open = current["OPEN"]
+        curr_fast_down = current[self.__fast_down]
+        curr_slow_down = current[self.__slow_down]
 
         # The first condition: checking the position of the closing price relative to indicators
         if (prev_close <= prev_fast_up) and (prev_close > prev_slow_down):
@@ -127,7 +125,7 @@ class WithDoubleTrend(StrategyAbstractClass):
                 )
 
     def __long_close(self, row: pd.DataFrame) -> None:
-        if pd.isna(row[self.__fast_down].iloc[0]):
+        if pd.isna(row[self.__fast_down]):
             self.__broker.market_order_sell(
                 {
                     "id": datetime.now().timestamp(),

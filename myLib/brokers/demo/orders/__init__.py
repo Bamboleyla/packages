@@ -29,7 +29,6 @@ class Orders:
     def __init__(self):
         self.__orders: list[LimitOrderTypedDict | MarketOrderTypedDict] = []
         self.__log = pd.DataFrame()
-        self.__position = Positions()
 
     def create(self, order: LimitOrderTypedDict | MarketOrderTypedDict):
         """
@@ -43,7 +42,7 @@ class Orders:
         self.__orders.clear()
         self.__orders.append(order)
 
-    def run(self, row: pd.DataFrame, index: int):
+    def run(self, row: pd.DataFrame, index: int, positions: Positions):
         """
         Execute trading orders and manage position closing for a given market data row.
 
@@ -59,21 +58,15 @@ class Orders:
         if len(self.__orders) > 0:
             for order in self.__orders:
                 if order["order"] == "LIMIT_BUY":
-                    buy_limit(
-                        order, row, index, self.__position, self.__log, self.__orders
-                    )
+                    buy_limit(order, row, index, positions, self.__log, self.__orders)
 
                 elif order["order"] == "LIMIT_SELL":
-                    sell_limit(
-                        order, row, index, self.__position, self.__log, self.__orders
-                    )
+                    sell_limit(order, row, index, positions, self.__log, self.__orders)
 
                 elif order["order"] == "MARKET_BUY":
-                    market_buy(
-                        order, row, index, self.__position, self.__log, self.__orders
-                    )
+                    market_buy(order, row, index, positions, self.__log, self.__orders)
         # Closing positions at the end of the day
-        market_stop(row, index, self.__position, self.__log, self.__orders)
+        market_stop(row, index, positions, self.__log, self.__orders)
 
     def get_log(self) -> pd.DataFrame:
         """

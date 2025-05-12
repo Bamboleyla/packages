@@ -32,20 +32,20 @@ def buy_limit(
     - Optionally creates a take profit sell order
     """
 
-    if order["price"] <= row["HIGH"].iloc[0] and order["price"] >= row["LOW"].iloc[0]:
+    if order["price"] <= row["HIGH"] and order["price"] >= row["LOW"]:
         position.increase(order["size"])
         log.loc[index, "SIGNAL"] = order["message"]
         log.loc[index, "BUY_PRICE"] = order["price"]
         orders[:] = [item for item in orders if item["id"] != order["id"]]
 
-    if "take_profit" in order:
-        orders.append(
-            {
-                "id": datetime.now().timestamp(),
-                "strategy": order["strategy"],
-                "message": "TAKE_PROFIT",
-                "order": "LIMIT_SELL",
-                "price": order["take_profit"],
-                "size": order["size"],
-            }
-        )
+        if "take_profit" in order:
+            orders.append(
+                {
+                    "id": datetime.now().timestamp(),
+                    "strategy": order["strategy"],
+                    "message": "TAKE_PROFIT",
+                    "order": "LIMIT_SELL",
+                    "price": order["take_profit"],
+                    "size": order["size"],
+                }
+            )

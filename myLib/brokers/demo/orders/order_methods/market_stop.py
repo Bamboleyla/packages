@@ -43,8 +43,7 @@ def market_stop(
 
     if (
         positions > 0
-        and pd.to_datetime(row["DATE"].iloc[0]).time()
-        == pd.Timestamp("23:45:00").time()
+        and pd.to_datetime(row["DATE"]).time() == pd.Timestamp("23:45:00").time()
     ):
         position.decrease(positions)
         log.loc[index, "SIGNAL"] = "MARKET_STOP"

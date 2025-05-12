@@ -12,8 +12,6 @@ __all__ = [
     "MarketOrderTypedDict",
 ]
 
-demo_broker = DemoBroker()
-
 
 class Brokers:
     """Represents all brokers."""
@@ -21,4 +19,4 @@ class Brokers:
     def __init__(self):
         """Initializes all brokers."""
         self.alor = Alor()
-        self.demo = demo_broker
+        self.demo = DemoBroker()
