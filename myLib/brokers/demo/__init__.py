@@ -30,14 +30,11 @@ class DemoBroker(BrokerAbstractClass):
     def get_orders_log(self) -> pd.DataFrame:
         return self.__orders.get_log()
 
-    def limit_order_buy(self, order: LimitOrderTypedDict) -> None:
+    def create_order(self, order: LimitOrderTypedDict | MarketOrderTypedDict) -> None:
         self.__orders.create(order)
 
-    def limit_order_sell(self, order: LimitOrderTypedDict) -> None:
-        self.__orders.create(order)
+    def get_orders(self) -> list[LimitOrderTypedDict | MarketOrderTypedDict]:
+        return self.__orders.get_orders()
 
-    def marker_order_buy(self, order: MarketOrderTypedDict) -> None:
-        self.__orders.create(order)
-
-    def market_order_sell(self, order: MarketOrderTypedDict) -> None:
-        self.__orders.create(order)
+    def cancel_order(self, order_id: float) -> None:
+        self.__orders.delete_order(order_id)

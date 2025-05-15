@@ -15,9 +15,10 @@ The module integrates with position management and maintains a log of all order 
 import pandas as pd
 from myLib.brokers.types.orders import LimitOrderTypedDict, MarketOrderTypedDict
 from ..positions import Positions
-from .order_methods.buy_limit import buy_limit
-from .order_methods.sell_limit import sell_limit
+from .order_methods.limit_buy import limit_buy
+from .order_methods.limit_sell import limit_sell
 from .order_methods.market_buy import market_buy
+from .order_methods.market_sell import market_sell
 from .order_methods.market_stop import market_stop
 
 __all__ = ["Orders"]
@@ -32,14 +33,13 @@ class Orders:
 
     def create(self, order: LimitOrderTypedDict | MarketOrderTypedDict):
         """
-        Create a new order by clearing existing orders and adding the specified order.
+        Create a new order and add it to the orders list.
 
         Args:
             order (LimitOrderTypedDict | MarketOrderTypedDict): The order to be created and added
               to the orders list.
         """
 
-        self.__orders.clear()
         self.__orders.append(order)
 
     def run(self, row: pd.DataFrame, index: int, positions: Positions):
@@ -58,13 +58,16 @@ class Orders:
         if len(self.__orders) > 0:
             for order in self.__orders:
                 if order["order"] == "LIMIT_BUY":
-                    buy_limit(order, row, index, positions, self.__log, self.__orders)
+                    limit_buy(order, row, index, positions, self.__log, self.__orders)
 
                 elif order["order"] == "LIMIT_SELL":
-                    sell_limit(order, row, index, positions, self.__log, self.__orders)
+                    limit_sell(order, row, index, positions, self.__log, self.__orders)
 
                 elif order["order"] == "MARKET_BUY":
                     market_buy(order, row, index, positions, self.__log, self.__orders)
+
+                elif order["order"] == "MARKET_SELL":
+                    market_sell(order, row, index, positions, self.__log, self.__orders)
         # Closing positions at the end of the day
         market_stop(row, index, positions, self.__log, self.__orders)
 
@@ -77,3 +80,31 @@ class Orders:
         """
 
         return self.__log
+
+    def get_orders(self) -> list[LimitOrderTypedDict | MarketOrderTypedDict]:
+        """
+        Retrieve the current list of active orders.
+
+        Returns:
+            list[LimitOrderTypedDict | MarketOrderTypedDict]: A list containing the current active orders.
+        """
+
+        return self.__orders
+
+    def delete_order(self, order_id: float) -> None:
+        """
+        Delete an order with the specified order_id from the active orders list.
+
+        Args:
+            order_id (float): The ID of the order to be deleted.
+
+        Raises:
+            ValueError: If no order with the specified ID is found.
+        """
+        for order in self.__orders:
+            if order["id"] == order_id:
+                self.__orders.remove(order)
+                return
+
+        # If we get here, no order with the specified ID was found
+        raise ValueError(f"Order with ID {order_id} not found")

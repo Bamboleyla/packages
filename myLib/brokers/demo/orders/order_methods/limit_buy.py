@@ -1,11 +1,11 @@
 from datetime import datetime
 import pandas as pd
 
-from myLib.brokers.types import LimitOrderTypedDict, MarketOrderTypedDict
+from myLib.brokers.types import LimitOrderTypedDict, MarketOrderTypedDict, OrderType
 from myLib.brokers.demo.positions import Positions
 
 
-def buy_limit(
+def limit_buy(
     order: LimitOrderTypedDict,
     row: pd.DataFrame,
     index: int,
@@ -34,7 +34,7 @@ def buy_limit(
 
     if order["price"] <= row["HIGH"] and order["price"] >= row["LOW"]:
         position.increase(order["size"])
-        log.loc[index, "SIGNAL"] = order["message"]
+        log.loc[index, "SIGNAL"] = order["signal"]
         log.loc[index, "BUY_PRICE"] = order["price"]
         orders[:] = [item for item in orders if item["id"] != order["id"]]
 
@@ -43,8 +43,8 @@ def buy_limit(
                 {
                     "id": datetime.now().timestamp(),
                     "strategy": order["strategy"],
-                    "message": "TAKE_PROFIT",
-                    "order": "LIMIT_SELL",
+                    "signal": "TAKE_PROFIT",
+                    "order": OrderType.LIMIT_SELL,
                     "price": order["take_profit"],
                     "size": order["size"],
                 }

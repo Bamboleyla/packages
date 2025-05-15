@@ -20,7 +20,7 @@ from myLib.brokers.types import LimitOrderTypedDict, MarketOrderTypedDict
 from myLib.brokers.demo.positions import Positions
 
 
-def sell_limit(
+def limit_sell(
     order: LimitOrderTypedDict,
     row: pd.DataFrame,
     index: int,
@@ -48,6 +48,6 @@ def sell_limit(
 
     if order["price"] <= row["HIGH"] and order["price"] >= row["LOW"]:
         position.decrease(order["size"])
-        log.loc[index, "SIGNAL"] = order["message"]
+        log.loc[index, "SIGNAL"] = order["signal"]
         log.loc[index, "SELL_PRICE"] = order["price"]
         orders[:] = [item for item in orders if item["id"] != order["id"]]

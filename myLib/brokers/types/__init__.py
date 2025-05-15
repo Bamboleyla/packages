@@ -12,6 +12,11 @@ Type Definitions:
 """
 
 from .broker import BrokerAbstractClass
-from .orders import LimitOrderTypedDict, MarketOrderTypedDict
+from .orders import LimitOrderTypedDict, MarketOrderTypedDict, OrderType
 
-__all__ = ["BrokerAbstractClass", "LimitOrderTypedDict", "MarketOrderTypedDict"]
+__all__ = [
+    "BrokerAbstractClass",
+    "LimitOrderTypedDict",
+    "MarketOrderTypedDict",
+    "OrderType",
+]

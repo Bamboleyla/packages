@@ -32,17 +32,13 @@ class BrokerAbstractClass(ABC):
         """
 
     @abstractmethod
-    def limit_order_buy(self, order: LimitOrderTypedDict) -> None:
+    def create_order(self, order: LimitOrderTypedDict | MarketOrderTypedDict) -> None:
         pass
 
     @abstractmethod
-    def limit_order_sell(self, order: LimitOrderTypedDict) -> None:
+    def get_orders(self) -> list[LimitOrderTypedDict | MarketOrderTypedDict]:
         pass
 
     @abstractmethod
-    def marker_order_buy(self, order: MarketOrderTypedDict) -> None:
-        pass
-
-    @abstractmethod
-    def market_order_sell(self, order: MarketOrderTypedDict) -> None:
+    def cancel_order(self) -> None:
         pass
