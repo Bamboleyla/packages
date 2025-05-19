@@ -2,7 +2,7 @@ from datetime import datetime
 
 import pandas as pd
 from myLib.brokers import OrderType, BrokerAbstractClass
-from .types import DoubleTrendSignals
+from myLib.strategies.withDoubleTrend.types import DoubleTrendSignals
 
 
 def long_close_method(
@@ -24,7 +24,7 @@ def long_close_method(
             {
                 "id": datetime.now().timestamp(),
                 "strategy": strategy_name,
-                "signal": DoubleTrendSignals.LONG_SELL,
+                "signal": DoubleTrendSignals.LONG_TP,
                 "order": OrderType.MARKET_SELL,
                 "size": 1,
             }

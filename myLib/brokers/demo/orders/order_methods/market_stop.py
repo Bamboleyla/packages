@@ -39,13 +39,12 @@ def market_stop(
         orders (list[LimitOrderTypedDict | MarketOrderTypedDict]): List of active orders.
     """
 
-    positions = position.get_position()
-
+    positions = position.get_position()["size"]
     if (
         positions > 0
         and pd.to_datetime(row["DATE"]).time() == pd.Timestamp("23:45:00").time()
     ):
-        position.decrease(positions)
+        position.decrease(quantity=positions, price=row["OPEN"])
         log.loc[index, "SIGNAL"] = "MARKET_STOP"
         log.loc[index, "SELL_PRICE"] = row["OPEN"]
         orders.clear()

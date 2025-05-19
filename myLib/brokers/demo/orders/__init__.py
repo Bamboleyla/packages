@@ -13,7 +13,11 @@ The module integrates with position management and maintains a log of all order 
 """
 
 import pandas as pd
-from myLib.brokers.types.orders import LimitOrderTypedDict, MarketOrderTypedDict
+from myLib.brokers.types.orders import (
+    LimitOrderTypedDict,
+    MarketOrderTypedDict,
+    OrderType,
+)
 from ..positions import Positions
 from .order_methods.limit_buy import limit_buy
 from .order_methods.limit_sell import limit_sell
@@ -57,16 +61,19 @@ class Orders:
         # Processing of orders
         if len(self.__orders) > 0:
             for order in self.__orders:
-                if order["order"] == "LIMIT_BUY":
+                if order["order"] == OrderType.LIMIT_BUY:
                     limit_buy(order, row, index, positions, self.__log, self.__orders)
 
-                elif order["order"] == "LIMIT_SELL":
+                elif (
+                    order["order"] == OrderType.LIMIT_SELL
+                    or order["order"] == OrderType.LONG_TP
+                ):
                     limit_sell(order, row, index, positions, self.__log, self.__orders)
 
-                elif order["order"] == "MARKET_BUY":
+                elif order["order"] == OrderType.MARKET_BUY:
                     market_buy(order, row, index, positions, self.__log, self.__orders)
 
-                elif order["order"] == "MARKET_SELL":
+                elif order["order"] == OrderType.MARKET_SELL:
                     market_sell(order, row, index, positions, self.__log, self.__orders)
         # Closing positions at the end of the day
         market_stop(row, index, positions, self.__log, self.__orders)

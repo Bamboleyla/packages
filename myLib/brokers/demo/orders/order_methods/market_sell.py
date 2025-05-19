@@ -11,7 +11,7 @@ def market_sell(
     log: pd.DataFrame,
     orders: MarketOrderTypedDict,
 ):
-    position.decrease(order["size"])
+    position.decrease(quantity=order["size"], price=row["CLOSE"])
     log.loc[index, "SIGNAL"] = order["signal"]
     log.loc[index, "SELL_PRICE"] = row["CLOSE"]
     orders[:] = [item for item in orders if item["id"] != order["id"]]

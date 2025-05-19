@@ -47,7 +47,7 @@ def limit_sell(
     """
 
     if order["price"] <= row["HIGH"] and order["price"] >= row["LOW"]:
-        position.decrease(order["size"])
+        position.decrease(quantity=order["size"], price=order["price"])
         log.loc[index, "SIGNAL"] = order["signal"]
         log.loc[index, "SELL_PRICE"] = order["price"]
         orders[:] = [item for item in orders if item["id"] != order["id"]]

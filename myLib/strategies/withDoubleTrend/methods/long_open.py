@@ -2,8 +2,7 @@ from datetime import datetime
 
 import pandas as pd
 from myLib.brokers import BrokerAbstractClass, OrderType
-from ..strategy import StrategyAbstractClass
-from .types import SuperTrendParamsTypedDict, DoubleTrendSignals
+from myLib.strategies.withDoubleTrend.types import DoubleTrendSignals
 
 
 def long_open_method(
