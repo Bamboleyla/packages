@@ -68,6 +68,9 @@ class Orders:
                     order["order"] == OrderType.LIMIT_SELL
                     or order["order"] == OrderType.LONG_TP
                 ):
+                    if order["order"] == OrderType.LONG_TP:
+                        self.__log.loc[index, "TAKE_PROFIT"] = order["price"]
+
                     limit_sell(order, row, index, positions, self.__log, self.__orders)
 
                 elif order["order"] == OrderType.MARKET_BUY:

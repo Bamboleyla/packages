@@ -15,8 +15,9 @@ Usage:
 
 from .withDoubleTrend import WithDoubleTrend
 from .strategy import StrategyAbstractClass
+from .types.plot_data import PlotDataTypedDict
 
-__all__ = ["Strategies", "StrategyAbstractClass"]
+__all__ = ["Strategies", "StrategyAbstractClass", "PlotDataTypedDict"]
 
 
 class Strategies:

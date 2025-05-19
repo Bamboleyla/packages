@@ -3,10 +3,13 @@ import pandas as pd
 from myLib.brokers import OrderType, BrokerAbstractClass
 from ..strategy import StrategyAbstractClass
 from .types import SuperTrendParamsTypedDict, DoubleTrendSignals
+from ..types.plot_data import PlotDataTypedDict
 from .methods.long_close import long_close_method
 from .methods.long_open import long_open_method
+from .methods.plot_data import plot_data
 
-__all__ = ["WithDoubleTrend"]
+
+__all__ = ["WithDoubleTrend", "PlotDataTypedDict"]
 
 
 class WithDoubleTrend(StrategyAbstractClass):
@@ -76,3 +79,6 @@ class WithDoubleTrend(StrategyAbstractClass):
                 )
         else:
             raise ValueError("Position size is not correct.")
+
+    def get_plot_data(self) -> PlotDataTypedDict:
+        return plot_data()

@@ -8,6 +8,7 @@ strategy analysis on financial market data.
 
 from abc import ABC, abstractmethod
 import pandas as pd
+from .types.plot_data import PlotDataTypedDict
 
 __all__ = ["StrategyAbstractClass"]
 
@@ -23,4 +24,8 @@ class StrategyAbstractClass(ABC):
 
     @abstractmethod
     def run(self, previous: pd.DataFrame, current: pd.DataFrame) -> None:
+        pass
+
+    @abstractmethod
+    def get_plot_data(self) -> PlotDataTypedDict:
         pass
