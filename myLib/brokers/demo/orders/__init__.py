@@ -75,8 +75,10 @@ class Orders:
 
                 elif order["order"] == OrderType.MARKET_SELL:
                     market_sell(order, row, index, positions, self.__log, self.__orders)
-        # Closing positions at the end of the day
-        market_stop(row, index, positions, self.__log, self.__orders)
+                else:
+                    raise ValueError(
+                        f"Unknown order type: {order['order']}. Supported types are: LIMIT_BUY, LIMIT_SELL, MARKET_BUY, MARKET_SELL."
+                    )
 
     def get_log(self) -> pd.DataFrame:
         """

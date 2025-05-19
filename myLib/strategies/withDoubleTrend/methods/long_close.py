@@ -24,7 +24,7 @@ def long_close_method(
             {
                 "id": datetime.now().timestamp(),
                 "strategy": strategy_name,
-                "signal": DoubleTrendSignals.LONG_TP,
+                "signal": DoubleTrendSignals.LONG_SELL,
                 "order": OrderType.MARKET_SELL,
                 "size": 1,
             }
