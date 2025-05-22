@@ -42,3 +42,7 @@ class BrokerAbstractClass(ABC):
     @abstractmethod
     def cancel_order(self) -> None:
         pass
+
+    @abstractmethod
+    def cancel_all_orders(self) -> None:
+        pass

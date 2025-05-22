@@ -38,3 +38,6 @@ class DemoBroker(BrokerAbstractClass):
 
     def cancel_order(self, order_id: float) -> None:
         self.__orders.delete_order(order_id)
+
+    def cancel_all_orders(self) -> None:
+        self.__orders.delete_all_orders()

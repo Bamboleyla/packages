@@ -67,9 +67,13 @@ class Orders:
                 elif (
                     order["order"] == OrderType.LIMIT_SELL
                     or order["order"] == OrderType.LONG_TP
+                    or order["order"] == OrderType.LONG_SL
                 ):
                     if order["order"] == OrderType.LONG_TP:
                         self.__log.loc[index, "TAKE_PROFIT"] = order["price"]
+
+                    elif order["order"] == OrderType.LONG_SL:
+                        self.__log.loc[index, "STOP_LOSS"] = order["price"]
 
                     limit_sell(order, row, index, positions, self.__log, self.__orders)
 
@@ -120,3 +124,9 @@ class Orders:
 
         # If we get here, no order with the specified ID was found
         raise ValueError(f"Order with ID {order_id} not found")
+
+    def delete_all_orders(self) -> None:
+        """
+        Delete all active orders.
+        """
+        self.__orders = []
