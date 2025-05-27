@@ -9,4 +9,3 @@ class Alor:
     def __init__(self):
         """Initializes the broker with an AlorDownloader instance."""
         self.downloader = AlorDownloader()
-        print("Alor Broker initialized")
