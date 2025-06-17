@@ -12,7 +12,8 @@ from myLib.strategies.withDoubleTrend.types import DoubleTrendSignals
 def manage_long(
     broker: BrokerAbstractClass,
     orders: list[LimitOrderTypedDict | MarketOrderTypedDict],
-    data: pd.DataFrame,
+    curr: pd.DataFrame,
+    prev: pd.DataFrame,
     positions: dict[str, int],
 ) -> None:
     """Manage long positions and related orders for DoubleTrend strategy.
@@ -30,15 +31,23 @@ def manage_long(
         raise ValueError("Position size cannot be negative.")
 
     # Check strategy conditions
-    condition = pd.notna(data.get("ST 10 3 UP")) and pd.notna(data.get("ST 20 5 LOW"))
-    is_close_time = (
-        pd.to_datetime(data.get("DATE")).time() == pd.Timestamp("23:40:00").time()
+    condition_1 = (
+        pd.notna(curr.get("ST 10 3 LOW"))
+        and pd.notna(curr.get("ST 20 5 LOW"))
+        and pd.notna(prev.get("ST 20 5 UP"))
+    )
+    condition_2 = (
+        pd.notna(curr.get("ST 10 3 LOW"))
+        and pd.notna(curr.get("ST 20 5 LOW"))
+        and pd.notna(prev.get("ST 10 3 UP"))
     )
 
-    # Helper functions
-    def calculate_entry_price() -> float:
-        threshold = round((data["ST 10 3 UP"] - data["ST 20 5 LOW"]) / 5, 2)
-        return threshold + data["ST 20 5 LOW"]
+    is_close_time = (
+        pd.to_datetime(curr.get("DATE")).time() == pd.Timestamp("23:40:00").time()
+    )
+    is_open_time = (
+        pd.to_datetime(curr.get("DATE")).time() == pd.Timestamp("09:30:00").time()
+    )
 
     def create_buy_order(price: float) -> None:
         broker.create_order(
@@ -75,15 +84,12 @@ def manage_long(
         )
 
         if existing_buy_order:
-            if not condition:
+            if pd.isna(curr.get("ST 10 3 LOW")):
                 broker.cancel_order(existing_buy_order["id"])
-            else:
-                entry_price = calculate_entry_price()
-                if existing_buy_order["price"] != entry_price:
-                    broker.cancel_order(existing_buy_order["id"])
-                    create_buy_order(entry_price)
-        elif condition:
-            create_buy_order(calculate_entry_price())
+        elif condition_1:
+            create_buy_order(prev.get("ST 20 5 UP"))
+        elif condition_2:
+            create_buy_order(prev.get("ST 10 3 UP"))
         return
 
     # Case 2: Have position - manage exit conditions
@@ -91,6 +97,10 @@ def manage_long(
         if order["signal"] == DoubleTrendSignals.LONG_BUY:
             broker.cancel_order(order["id"])
 
-    if not condition or is_close_time:
+    if (
+        pd.isna(curr.get("ST 10 3 LOW"))
+        and pd.isna(curr.get("ST 20 5 LOW"))
+        or is_close_time
+    ):
         broker.cancel_all_orders()
         create_market_sell_order()

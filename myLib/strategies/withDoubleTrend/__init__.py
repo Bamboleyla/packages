@@ -17,7 +17,7 @@ class WithDoubleTrend(StrategyAbstractClass):
         self.name: str = "WithDoubleTrend"
         self._broker: BrokerAbstractClass = broker
 
-    def _manage_positions(self, current: pd.DataFrame) -> None:
+    def run(self, current: pd.DataFrame, previous: pd.DataFrame) -> None:
         """Combines position management (TP, SL and basic logic)"""
         positions = self._broker.get_positions()
         orders = self._broker.get_orders()
@@ -38,13 +38,10 @@ class WithDoubleTrend(StrategyAbstractClass):
         manage_long(
             positions=positions,
             broker=self._broker,
-            data=current,
+            curr=current,
+            prev=previous,
             orders=orders,
         )
-
-    def run(self, current: pd.DataFrame) -> None:
-        """The main method of strategy for processing new data"""
-        self._manage_positions(current)
 
     def get_plot_data(self) -> PlotDataTypedDict:
         """Returns data for visualization"""
