@@ -1,4 +1,4 @@
-from typing import TypedDict, List, Literal, Optional
+from typing import TypedDict, List, Literal
 from myLib.strategies.withDoubleTrend.types import DoubleTrendSignals
 
 
@@ -6,7 +6,6 @@ class PlotConfig(TypedDict):
     column: str
     color: str
     width: int
-    style: Optional[str]
 
 
 class ActionConfig(TypedDict):

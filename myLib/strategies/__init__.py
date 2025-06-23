@@ -14,23 +14,13 @@ Usage:
 """
 
 from .withDoubleTrend import WithDoubleTrend
+from .price_chanel import PriceChanelGrid
 from .strategy import StrategyAbstractClass
 from .types.plot_data import PlotDataTypedDict
 
-__all__ = ["Strategies", "StrategyAbstractClass", "PlotDataTypedDict"]
-
-
-class Strategies:
-    """
-    A collection of trading strategies for market analysis and trade execution.
-
-    This class provides access to various trading strategies implemented in the library.
-    Strategies can be instantiated and used for different trading approaches.
-
-    Attributes:
-        double_super_trend (WithDoubleTrend): A strategy utilizing two supertrend indicators
-        for comprehensive trend analysis.
-    """
-
-    def __init__(self):
-        self.double_super_trend = WithDoubleTrend
+__all__ = [
+    "StrategyAbstractClass",
+    "PlotDataTypedDict",
+    "WithDoubleTrend",
+    "PriceChanelGrid",
+]
