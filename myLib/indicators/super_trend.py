@@ -5,86 +5,86 @@ import numpy as np
 
 def super_trend(df: pd.DataFrame, config: list) -> pd.DataFrame:
     """
-    Рассчитывает индикатор SuperTrend для нескольких конфигураций.
+    Calculates the SuperTrend indicator for multiple configurations.
 
-    Параметры:
-        df: DataFrame с колонками ['OPEN', 'HIGH', 'LOW', 'CLOSE']
-        config: Список словарей с параметрами индикатора [{'period': int, 'multiplier': int}]
+    Parameters:
+        df: DataFrame with columns ['OPEN', 'HIGH', 'LOW', 'CLOSE']
+        config: List of dictionaries with indicator parameters [{'period': int, 'multiplier': int}]
 
-    Возвращает:
-        Новый DataFrame с добавленными колонками для каждой конфигурации
+    Returns:
+        New DataFrame with added columns for each configuration
     """
-    # Создаем копию DataFrame для безопасного добавления колонок
+    # Create a copy of DataFrame for safe column addition
     df = df.copy()
 
-    # Для каждой конфигурации в списке
+    # For each configuration in the list
     for params in config:
         period = params["period"]
         multiplier = params["multiplier"]
 
-        # Рассчитываем ATR
+        # Calculate ATR
         atr = talib.ATR(df["HIGH"], df["LOW"], df["CLOSE"], timeperiod=period)
 
-        # Базовые линии (классический метод)
+        # Basic lines
         hl2 = (df["HIGH"] + df["LOW"]) / 2
         basic_upper = hl2 + multiplier * atr
         basic_lower = hl2 - multiplier * atr
 
-        # Инициализация массивов для результатов
+        # Initialize result arrays
         n = len(df)
         st_upper = np.full(n, np.nan)
         st_lower = np.full(n, np.nan)
-        trend = np.zeros(n, dtype=int)  # 1 = верхний тренд, -1 = нижний тренд
+        trend = np.zeros(n, dtype=int)  # 1 = upper trend, -1 = lower trend
 
-        # Первый индекс с валидным ATR
+        # First index with valid ATR
         start_idx = period
         if start_idx >= n:
-            # Добавляем пустые колонки если данных недостаточно
+            # Add empty columns if not enough data
             df[f"ST_UPPER_{period}_{multiplier}"] = np.nan
             df[f"ST_LOWER_{period}_{multiplier}"] = np.nan
             continue
 
-        # Конвертируем в numpy массивы для ускорения
+        # Convert to numpy arrays for speed
         close_arr = df["CLOSE"].values
         basic_upper_arr = basic_upper.values
         basic_lower_arr = basic_lower.values
 
-        # Инициализация первого значения (начинаем с нижнего тренда)
+        # Initialize first value (start with lower trend)
         st_upper[start_idx] = basic_upper_arr[start_idx]
         st_lower[start_idx] = basic_lower_arr[start_idx]
-        trend[start_idx] = -1  # Начинаем с нижнего тренда
+        trend[start_idx] = 1  # Start with lower trend
 
-        # Основной цикл расчета
+        # Main calculation loop
         for i in range(start_idx + 1, n):
-            # Пропускаем NaN значения
+            # Skip NaN values
             if np.isnan(basic_upper_arr[i]) or np.isnan(basic_lower_arr[i]):
                 continue
 
-            # Рассчитываем линии ИСХОДЯ ИЗ ПРЕДЫДУЩЕГО ТРЕНДА
-            if trend[i - 1] == 1:  # Предыдущий тренд был верхний
+            # Calculate lines BASED ON PREVIOUS TREND
+            if trend[i - 1] == 1:  # Previous trend was upper
                 st_upper[i] = min(basic_upper_arr[i], st_upper[i - 1])
                 st_lower[i] = basic_lower_arr[i]
-            else:  # Предыдущий тренд был нижний
+            else:  # Previous trend was lower
                 st_upper[i] = basic_upper_arr[i]
                 st_lower[i] = max(basic_lower_arr[i], st_lower[i - 1])
 
-            # Определяем текущий тренд ПО ЗАКРЫТИЮ ТЕКУЩЕЙ СВЕЧИ
+            # Determine current trend BASED ON CURRENT CANDLE CLOSE
             if trend[i - 1] == 1 and close_arr[i] > st_upper[i]:
-                trend[i] = -1  # Переход в верхний тренд
+                trend[i] = -1  # Switch to upper trend
             elif trend[i - 1] == -1 and close_arr[i] < st_lower[i]:
-                trend[i] = 1  # Переход в нижний тренд
+                trend[i] = 1  # Switch to lower trend
             else:
-                trend[i] = trend[i - 1]  # Сохраняем предыдущий тренд
+                trend[i] = trend[i - 1]  # Keep previous trend
 
-        # Округляем значения до 3 знаков
+        # Round values to 3 decimal places
         st_upper = np.round(st_upper, 3)
         st_lower = np.round(st_lower, 3)
 
-        # Создаем колонки с учетом текущего тренда
+        # Create columns based on current trend
         upper_col = np.where(trend == 1, st_upper, np.nan)
         lower_col = np.where(trend == -1, st_lower, np.nan)
 
-        # Добавляем результаты в DataFrame
+        # Add results to DataFrame
         df[f"ST_UPPER_{period}_{multiplier}"] = upper_col
         df[f"ST_LOWER_{period}_{multiplier}"] = lower_col
 

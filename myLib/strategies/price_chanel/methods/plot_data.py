@@ -1,4 +1,4 @@
-from myLib.strategies.price_chanel.types import PriceChanelGridSignals
+# УДАЛЕНО: импорт PriceChanelGridSignals
 
 
 def plot_data():
@@ -15,11 +15,11 @@ def plot_data():
             "PC_20_MID",
             "ST_UPPER_30_7",
             "ST_LOWER_30_7",
-            "SIGNAL",
-            # "TAKE_PROFIT",
-            # "STOP_LOSS",
             "BUY_PRICE",
             "SELL_PRICE",
+            "SL_PRICE",
+            "CT_PRICE",
+            "CE_PRICE",
         ],
         "plots": [
             {"column": "PC_20_HIGH", "color": "#7B93FF", "width": 2},
@@ -27,17 +27,17 @@ def plot_data():
             {"column": "PC_20_MID", "color": "#BFFF2B", "width": 3},
             {"column": "ST_UPPER_30_7", "color": "#FA0000", "width": 3},
             {"column": "ST_LOWER_30_7", "color": "#006400", "width": 3},
-            # {"column": "EMA 50", "color": "#3C74BD", "width": 1},
-            # {"column": "TAKE_PROFIT", "color": "#47F77B", "width": 1},
-            # {"column": "STOP_LOSS", "color": "#FF5B5B", "width": 1},
         ],
         "actions": [
             {"column": "BUY_PRICE", "color": "#000000", "style": "x", "width": 2},
             {"column": "SELL_PRICE", "color": "#000000", "style": "x", "width": 2},
+            {"column": "SL_PRICE", "color": "#000000", "style": "x", "width": 2},
+            {"column": "CT_PRICE", "color": "#000000", "style": "x", "width": 2},
+            {"column": "CE_PRICE", "color": "#000000", "style": "x", "width": 2},
         ],
         "signals": [
             {
-                "name": PriceChanelGridSignals.LONG_BUY,
+                "name": "BUY",
                 "price_col": "BUY_PRICE",
                 "offset": -1,
                 "color": "#4a6",
@@ -46,7 +46,7 @@ def plot_data():
                 "width": 2,
             },
             {
-                "name": PriceChanelGridSignals.LONG_SELL,
+                "name": "SELL",
                 "price_col": "SELL_PRICE",
                 "offset": 1,
                 "color": "#4a6",
@@ -54,23 +54,32 @@ def plot_data():
                 "legend": "sell",
                 "width": 2,
             },
-            # {
-            #     "name": PriceChanelGridSignals.LONG_TP,
-            #     "price_col": "TAKE_PROFIT",
-            #     "offset": 1,
-            #     "color": "#4a6",
-            #     "style": "p",
-            #     "legend": "take profit",
-            #     "width": 2,
-            # },
-            # {
-            #     "name": PriceChanelGridSignals.LONG_SL,
-            #     "price_col": "STOP_LOSS",
-            #     "offset": -1,
-            #     "color": "#4a6",
-            #     "style": "p",
-            #     "legend": "stop loss",
-            #     "width": 2,
-            # },
+            {
+                "name": "STOP_LOSS",
+                "price_col": "SL_PRICE",
+                "offset": 1,
+                "color": "#FF5B5B",
+                "style": "p",
+                "legend": "stop loss",
+                "width": 2,
+            },
+            {
+                "name": "CLOSE_TIME",
+                "price_col": "CT_PRICE",
+                "offset": 1,
+                "color": "#3C74BD",
+                "style": "d",
+                "legend": "close time",
+                "width": 2,
+            },
+            {
+                "name": "CLOSE_END",
+                "price_col": "CE_PRICE",
+                "offset": 1,
+                "color": "#000000",
+                "style": "*",
+                "legend": "close end",
+                "width": 2,
+            },
         ],
     }
