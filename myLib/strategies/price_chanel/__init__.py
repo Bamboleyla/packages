@@ -16,7 +16,8 @@ class PriceChanelGrid(StrategyAbstractClass):
             "indicators": [
                 {"type": "price_chanel", "period": 20},
                 {"type": "super_trend", "period": 30, "multiplier": 7},
-            ]
+            ],
+            "tickers": [{"tiker": "SBER", "figi": "BBG004730N88"}],
         }
 
     def run(self, data: pd.DataFrame) -> pd.DataFrame:
