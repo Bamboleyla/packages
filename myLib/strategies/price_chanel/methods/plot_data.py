@@ -1,7 +1,18 @@
 # УДАЛЕНО: импорт PriceChanelGridSignals
 
 
-def plot_data():
+def plot_data(self) -> dict:
+
+    pc_period = self._config["indicators"][0]["period"]
+    st_period = self._config["indicators"][1]["period"]
+    st_multiplier = self._config["indicators"][1]["multiplier"]
+
+    pc_high = f"PC_{pc_period}_HIGH"
+    pc_low = f"PC_{pc_period}_LOW"
+    pc_mid = f"PC_{pc_period}_MID"
+    st_upper = f"ST_UPPER_{st_period}_{st_multiplier}"
+    st_lower = f"ST_LOWER_{st_period}_{st_multiplier}"
+
     return {
         "legend": "PriceChanelGrid",
         "required_columns": [
@@ -10,11 +21,11 @@ def plot_data():
             "HIGH",
             "LOW",
             "DATE",
-            "PC_20_HIGH",
-            "PC_20_LOW",
-            "PC_20_MID",
-            "ST_UPPER_30_7",
-            "ST_LOWER_30_7",
+            pc_high,
+            pc_low,
+            pc_mid,
+            st_upper,
+            st_lower,
             "BUY_PRICE",
             "SELL_PRICE",
             "SL_PRICE",
@@ -22,11 +33,11 @@ def plot_data():
             "CE_PRICE",
         ],
         "plots": [
-            {"column": "PC_20_HIGH", "color": "#7B93FF", "width": 2},
-            {"column": "PC_20_LOW", "color": "#7B93FF", "width": 2},
-            {"column": "PC_20_MID", "color": "#BFFF2B", "width": 3},
-            {"column": "ST_UPPER_30_7", "color": "#FA0000", "width": 3},
-            {"column": "ST_LOWER_30_7", "color": "#006400", "width": 3},
+            {"column": pc_high, "color": "#7B93FF", "width": 2},
+            {"column": pc_low, "color": "#7B93FF", "width": 2},
+            {"column": pc_mid, "color": "#BFFF2B", "width": 3},
+            {"column": st_upper, "color": "#FA0000", "width": 3},
+            {"column": st_lower, "color": "#006400", "width": 3},
         ],
         "actions": [
             {"column": "BUY_PRICE", "color": "#000000", "style": "x", "width": 2},

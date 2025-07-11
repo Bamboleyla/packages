@@ -2,7 +2,7 @@ import pandas as pd
 import numpy as np
 
 
-def calculate(data: pd.DataFrame) -> pd.DataFrame:
+def calculate(data: pd.DataFrame, indicators: list[dict]) -> pd.DataFrame:
     # Initialize columns
     _initialize_columns(data)
 
@@ -13,31 +13,51 @@ def calculate(data: pd.DataFrame) -> pd.DataFrame:
     close_time = pd.Timestamp("23:00:00").time()
     stop_time = pd.Timestamp("23:40:00").time()
 
-    # Pre-calculate conditions
-    data["prev_PC_20_LOW"] = data["PC_20_LOW"].shift(1)
-    data["prev_PC_20_HIGH"] = data["PC_20_HIGH"].shift(1)
-    data["prev_ST_LOWER_30_7"] = data["ST_LOWER_30_7"].shift(1)
+    pc_period = indicators[0]["period"]
+    st_period = indicators[1]["period"]
+    st_multiplier = indicators[1]["multiplier"]
+
+    # Генерация имен колонок
+    pc_low_col = f"PC_{pc_period}_LOW"
+    pc_high_col = f"PC_{pc_period}_HIGH"
+    st_lower_col = f"ST_LOWER_{st_period}_{st_multiplier}"
+
+    prev_pc_low_col = f"prev_{pc_low_col}"
+    prev_pc_high_col = f"prev_{pc_high_col}"
+    prev_st_lower_col = f"prev_{st_lower_col}"
+
+    # Используем динамические имена везде
+    data[prev_pc_low_col] = data[pc_low_col].shift(1)
+    data[prev_pc_high_col] = data[pc_high_col].shift(1)
+    data[prev_st_lower_col] = data[st_lower_col].shift(1)
 
     data["open_condition"] = (
-        data["PC_20_LOW"].notna()
-        & data["ST_LOWER_30_7"].notna()
-        & (data["PC_20_LOW"] > data["ST_LOWER_30_7"])
-        & (data["LOW"] < data["prev_PC_20_LOW"])
+        data[pc_low_col].notna()
+        & data[st_lower_col].notna()
+        & (data[pc_low_col] > data[st_lower_col])
+        & (data["LOW"] < data[prev_pc_low_col])
     )
-    data["improve_condition"] = (
-        data["PC_20_LOW"].notna() & data["ST_LOWER_30_7"].notna()
-    )
+    data["improve_condition"] = data[pc_low_col].notna() & data[st_lower_col].notna()
     data["close_condition"] = (
-        data["PC_20_HIGH"].notna()
-        & data["ST_LOWER_30_7"].notna()
-        & (data["HIGH"] > data["prev_PC_20_HIGH"])
+        data[pc_high_col].notna()
+        & data[st_lower_col].notna()
+        & (data["HIGH"] > data[prev_pc_high_col])
     )
     data["stop_loss_condition"] = (
-        data["prev_ST_LOWER_30_7"].notna() & data["ST_LOWER_30_7"].isna()
+        data[prev_st_lower_col].notna() & data[st_lower_col].isna()
     )
 
     # Create and sort events
-    events = _create_events(data, times, open_time, close_time, stop_time)
+    events = _create_events(
+        data,
+        times,
+        open_time,
+        close_time,
+        stop_time,
+        prev_pc_low_col,
+        prev_pc_high_col,
+        prev_st_lower_col,
+    )
     events.sort(key=lambda x: x["index"])
 
     # Process events
@@ -131,9 +151,9 @@ def calculate(data: pd.DataFrame) -> pd.DataFrame:
 
     # Remove temporary columns
     columns_to_drop = [
-        "prev_PC_20_LOW",
-        "prev_PC_20_HIGH",
-        "prev_ST_LOWER_30_7",
+        prev_pc_low_col,
+        prev_pc_high_col,
+        prev_st_lower_col,
         "open_condition",
         "improve_condition",
         "close_condition",
@@ -161,7 +181,16 @@ def _initialize_columns(data):
         data[col] = np.nan
 
 
-def _create_events(data, times, open_time, close_time, stop_time):
+def _create_events(
+    data,
+    times,
+    open_time,
+    close_time,
+    stop_time,
+    prev_pc_low_col,
+    prev_pc_high_col,
+    prev_st_lower_col,
+):
     """Create all event types for processing"""
     events = []
     last_idx = data.index[-1]
@@ -176,19 +205,19 @@ def _create_events(data, times, open_time, close_time, stop_time):
 
     # Add BUY events
     buy_mask = (times > open_time) & (times < close_time) & data["open_condition"]
-    add_events(buy_mask, "BUY", lambda idx: data.loc[idx, "prev_PC_20_LOW"])
+    add_events(buy_mask, "BUY", lambda idx: data.loc[idx, prev_pc_low_col])
 
     # Add IMPROVE events
     add_events(data["improve_condition"], "IMPROVE")
 
     # Add SELL events
     sell_mask = (times > open_time) & (times < stop_time) & data["close_condition"]
-    add_events(sell_mask, "SELL", lambda idx: data.loc[idx, "prev_PC_20_HIGH"])
+    add_events(sell_mask, "SELL", lambda idx: data.loc[idx, prev_pc_high_col])
 
     # Add STOP_LOSS events
     stop_loss_mask = data["stop_loss_condition"]
     add_events(
-        stop_loss_mask, "STOP_LOSS", lambda idx: data.loc[idx, "prev_ST_LOWER_30_7"]
+        stop_loss_mask, "STOP_LOSS", lambda idx: data.loc[idx, prev_st_lower_col]
     )
 
     # Add time-based closing events

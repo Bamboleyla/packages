@@ -14,17 +14,17 @@ class PriceChanelGrid(StrategyAbstractClass):
         self._broker: BrokerAbstractClass = broker
         self._config = {
             "indicators": [
-                {"type": "price_chanel", "period": 20},
+                {"type": "price_chanel", "period": 30},
                 {"type": "super_trend", "period": 30, "multiplier": 7},
             ],
             "tickers": [{"tiker": "SBER", "figi": "BBG004730N88"}],
         }
 
     def run(self, data: pd.DataFrame) -> pd.DataFrame:
-        return calculate(data)
+        return calculate(data, self._config["indicators"])
 
     def get_config(self) -> dict:
         return self._config
 
     def get_plot_data(self):
-        return plot_data()
+        return plot_data(self)
