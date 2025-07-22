@@ -8,3 +8,4 @@ In this version 0.0.3:
         *Add new indicators: price channel, super trend
         *Add new strategy: PriceChanelGrid
         *Change strucure of the library
+        *Create Tinkoff broker

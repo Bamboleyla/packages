@@ -17,7 +17,7 @@ def calculate(data: pd.DataFrame, indicators: list[dict]) -> pd.DataFrame:
     st_period = indicators[1]["period"]
     st_multiplier = indicators[1]["multiplier"]
 
-    # Генерация имен колонок
+    # Generation of names of columns
     pc_low_col = f"PC_{pc_period}_LOW"
     pc_high_col = f"PC_{pc_period}_HIGH"
     st_lower_col = f"ST_LOWER_{st_period}_{st_multiplier}"
@@ -26,7 +26,6 @@ def calculate(data: pd.DataFrame, indicators: list[dict]) -> pd.DataFrame:
     prev_pc_high_col = f"prev_{pc_high_col}"
     prev_st_lower_col = f"prev_{st_lower_col}"
 
-    # Используем динамические имена везде
     data[prev_pc_low_col] = data[pc_low_col].shift(1)
     data[prev_pc_high_col] = data[pc_high_col].shift(1)
     data[prev_st_lower_col] = data[st_lower_col].shift(1)

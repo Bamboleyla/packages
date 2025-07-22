@@ -1,7 +1,14 @@
 import pandas as pd
 import os
-from datetime import datetime, timedelta
-import requests
+from .methods.get_candles import get_candles
+from .methods.get_positions import get_positions
+from .methods.get_orders import get_orders
+from .methods.post_order import post_order
+from .methods.replace_order import replace_order
+from .methods.cancel_order import cancel_order
+from .methods.post_stop_order import post_stop_order
+from .methods.get_portfolio import get_portfolio
+from .methods.get_operations import get_operations
 
 __all__ = ["Tinkoff"]
 
@@ -12,6 +19,12 @@ class Tinkoff:
     def __init__(self):
         self.name = "Tinkoff"
         self.token = os.getenv("TINKOFF_TOKEN")
+        self.account_id = os.getenv("TINKOFF_ACCOUNT_ID")
+        self.request_headers = {
+            "accept": "application/json",
+            "Authorization": f"Bearer {self.token}",
+            "Content-Type": "application/json",
+        }
 
     def get_candles(
         self,
@@ -21,60 +34,99 @@ class Tinkoff:
         interval: str = "CANDLE_INTERVAL_5_MIN",
         is_complete: bool = True,
     ) -> pd.DataFrame:
-        """
-        Retrieves candle data from Tinkoff Invest API
+        return get_candles(
+            self, instrument_id, start_date, end_date, interval, is_complete
+        )
 
-        Parameters:
-            instrument_id (str): FIGI of the instrument
-            start_date (str): Start date in format "%Y-%m-%dT%H:%M:%S.%fZ"
-            end_date (str): End date in format "%Y-%m-%dT%H:%M:%S.%fZ"
-            interval (str): Candle interval (default: 5 minutes)
-            is_complete (bool): If True, returns only complete candles
+    def get_positions(self):
+        return get_positions(self)
 
-        Returns:
-            pd.DataFrame: DataFrame with candle data
-        """
-        url = "https://invest-public-api.tinkoff.ru/rest/tinkoff.public.invest.api.contract.v1.MarketDataService/GetCandles"
+    def get_orders(self):
+        return get_orders(self)
 
-        headers = {
-            "accept": "application/json",
-            "Authorization": f"Bearer {self.token}",  # token is expected to be stored in broker
-            "Content-Type": "application/json",
-        }
+    def create_limit_buy_order(self, price: float, instrument_id: str, quantity: int):
+        return post_order(
+            self=self,
+            order_type="ORDER_TYPE_LIMIT",
+            instrument_id=instrument_id,
+            quantity=quantity,
+            price=price,
+            direction="ORDER_DIRECTION_BUY",
+        )
 
-        payload = {
-            "from": start_date,
-            "to": end_date,
-            "interval": interval,
-            "instrumentId": instrument_id,
-            "candleSourceType": "CANDLE_SOURCE_UNSPECIFIED",
-        }
+    def create_limit_sell_order(self, price: float, instrument_id: str, quantity: int):
+        return post_order(
+            self=self,
+            order_type="ORDER_TYPE_LIMIT",
+            instrument_id=instrument_id,
+            quantity=quantity,
+            price=price,
+            direction="ORDER_DIRECTION_SELL",
+        )
 
-        response = requests.post(url, headers=headers, json=payload)
-        response.raise_for_status()  # check for errors
+    def create_market_buy_order(self, instrument_id: str, quantity: int):
+        return post_order(
+            self=self,
+            order_type="ORDER_TYPE_MARKET",
+            instrument_id=instrument_id,
+            quantity=quantity,
+            direction="ORDER_DIRECTION_BUY",
+            price=None,
+        )
 
-        # Convert response to DataFrame
-        candles = response.json()["candles"]
-        data = []
+    def create_market_sell_order(self, instrument_id: str, quantity: int):
+        return post_order(
+            self=self,
+            order_type="ORDER_TYPE_MARKET",
+            instrument_id=instrument_id,
+            quantity=quantity,
+            direction="ORDER_DIRECTION_SELL",
+            price=None,
+        )
 
-        for candle in candles:
-            if not is_complete or candle["isComplete"]:
-                data.append(
-                    {
-                        "DATE": (
-                            datetime.strptime(candle["time"], "%Y-%m-%dT%H:%M:%SZ")
-                            + timedelta(hours=3)
-                        ).strftime("%Y-%m-%dT%H:%M:%SZ"),
-                        "OPEN": float(candle["open"]["units"])
-                        + float(candle["open"]["nano"]) / 1e9,
-                        "HIGH": float(candle["high"]["units"])
-                        + float(candle["high"]["nano"]) / 1e9,
-                        "LOW": float(candle["low"]["units"])
-                        + float(candle["low"]["nano"]) / 1e9,
-                        "CLOSE": float(candle["close"]["units"])
-                        + float(candle["close"]["nano"]) / 1e9,
-                        "VOLUME": candle["volume"],
-                    }
-                )
+    def replace_order(
+        self, order_id: str, price: float, instrument_id: str, quantity: int
+    ):
+        return replace_order(
+            self,
+            order_id=order_id,
+            instrument_id=instrument_id,
+            quantity=quantity,
+            price=price,
+        )
 
-        return pd.DataFrame(data)
+    def cancel_order(self, order_id: str):
+        return cancel_order(
+            self,
+            order_id=order_id,
+        )
+
+    def create_long_stop_loss_order(
+        self, price: float, instrument_id: str, quantity: int
+    ):
+        return post_stop_order(
+            self=self,
+            stop_order_type="STOP_ORDER_TYPE_STOP_LOSS",
+            instrument_id=instrument_id,
+            quantity=quantity,
+            price=price,
+            direction="STOP_ORDER_DIRECTION_SELL",
+        )
+
+    def create_long_take_profit_order(
+        self, price: float, instrument_id: str, quantity: int
+    ):
+        return post_stop_order(
+            self=self,
+            stop_order_type="STOP_ORDER_TYPE_TAKE_PROFIT",
+            instrument_id=instrument_id,
+            quantity=quantity,
+            price=price,
+            direction="STOP_ORDER_DIRECTION_SELL",
+        )
+
+    def get_portfolio(self):
+        return get_portfolio(self)
+
+    def get_operations(self, figi, from_date):
+        return get_operations(self, figi, from_date)
