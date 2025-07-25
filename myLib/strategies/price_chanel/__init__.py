@@ -17,6 +17,7 @@ class PriceChanelGrid(StrategyAbstractClass):
         self._order = None
         self._take_profit = None
         self._stop_loss = None
+        self._reducing_position_order = None
         self._last_buy_price = None
         self._from_date = (
             pd.Timestamp.now().normalize().strftime("%Y-%m-%dT%H:%M:%S.%fZ")

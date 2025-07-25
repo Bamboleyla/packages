@@ -237,7 +237,7 @@ def _create_events(
 
 def _open_position(data, idx, price, position_prices):
     """Open a new position and return balance change and commission"""
-    commission = round(price * 0.00005, 2)
+    commission = round(price * 0.0005, 2)
     data.loc[idx, "BUY_PRICE"] = price
 
     position_prices.append(price + commission)
@@ -248,7 +248,7 @@ def _open_position(data, idx, price, position_prices):
 
 def _close_position(data, idx, price, position, close_type):
     """Close a position and return balance change and commission"""
-    commission = round(price * 0.00005 * position, 2)
+    commission = round(price * 0.0005 * position, 2)
     if close_type == "STOP_LOSS":
         data.loc[idx, "SL_PRICE"] = price
     elif close_type == "CLOSE_TIME":
@@ -270,10 +270,10 @@ def _try_improve_position(data, idx, position, position_prices, best_price):
 
     if position > 1:
         for prev_price in position_prices[:-1]:
-            price_with_comm = round(prev_price + prev_price * 0.0001, 2)
+            price_with_comm = round(prev_price + prev_price * 0.001, 2)
             if data.loc[idx, "LOW"] <= price_with_comm <= data.loc[idx, "HIGH"]:
                 data.loc[idx, "SELL_PRICE"] = price_with_comm
-                commission_sell = round(price_with_comm * 0.00005, 2)
+                commission_sell = round(price_with_comm * 0.0005, 2)
                 total_delta += price_with_comm - commission_sell
                 total_commission += commission_sell
                 position -= 1
@@ -282,7 +282,7 @@ def _try_improve_position(data, idx, position, position_prices, best_price):
 
     if data.loc[idx, "LOW"] <= best_price <= data.loc[idx, "HIGH"]:
         data.loc[idx, "BUY_PRICE"] = best_price
-        commission_buy = round(best_price * 0.00005, 2)
+        commission_buy = round(best_price * 0.0005, 2)
         total_delta += -best_price - commission_buy
         total_commission += commission_buy
         position_prices.append(best_price)

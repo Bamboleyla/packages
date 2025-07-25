@@ -1,5 +1,7 @@
 import pandas as pd
 import os
+
+from .methods.get_history import get_history
 from .methods.get_candles import get_candles
 from .methods.get_positions import get_positions
 from .methods.get_orders import get_orders
@@ -41,8 +43,8 @@ class Tinkoff:
     def get_positions(self):
         return get_positions(self)
 
-    def get_orders(self):
-        return get_orders(self)
+    def get_orders(self, figi: str):
+        return get_orders(self, figi)
 
     def create_limit_buy_order(self, price: float, instrument_id: str, quantity: int):
         return post_order(

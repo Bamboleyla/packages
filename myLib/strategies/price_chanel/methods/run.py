@@ -15,7 +15,7 @@ def run(self, data: pd.DataFrame) -> pd.DataFrame:
     if long_position is None and short_position is None:
         self.from_date = pd.Timestamp.now().strftime("%Y-%m-%dT%H:%M:%S.%fZ")
 
-    orders = self._broker.get_orders()["orders"]
+    orders = self._broker.get_orders(figi=self._figi)
 
     if len(orders) == 0:
         self._order = None
@@ -78,25 +78,45 @@ def run(self, data: pd.DataFrame) -> pd.DataFrame:
             last_buy_price = extract_price_from_dict(executed_buys[-1]["price"])
 
             if (
-                previous[ST_LOWER] < previous[PC_LOW]
+                self._order is None
+                and previous[ST_LOWER] < previous[PC_LOW]
                 and previous[PC_LOW] < last_buy_price
             ):
                 self._order = self._broker.create_limit_buy_order(
                     instrument_id=self._figi, price=previous[PC_LOW], quantity=1
                 )
-            elif int(long_position["quantityLots"]["units"]) > 1:
-                for buy in executed_buys:
-                    stop_price = round(extract_price_from_dict(buy["price"]) * 1.001)
-                    if not any(
-                        extract_price_from_dict(order["initialSecurityPrice"])
-                        == stop_price
-                        for order in orders
-                    ):
 
-                        self._broker.create_limit_buy_order(
+            elif int(long_position["quantityLots"]["units"]) > 1:
+                stop_price = round(
+                    extract_price_from_dict(long_position["averagePositionPrice"])
+                    * 1.001,
+                    2,
+                )
+                if self._reducing_position_order is None:
+                    self._reducing_position_order = (
+                        self._broker.create_limit_sell_order(
                             instrument_id=self._figi,
                             price=stop_price,
-                            quantity=1,
+                            quantity=int(long_position["quantityLots"]["units"]) - 1,
+                        )
+                    )
+                else:
+                    reducing_position_order_price = extract_price_from_dict(
+                        self._reducing_position_order["initialSecurityPrice"]
+                    )
+                    if reducing_position_order_price != stop_price or int(
+                        long_position["quantityLots"]["units"]
+                    ) - 1 != int(self._reducing_position_order["lotsRequested"]):
+                        self._broker.cancel_order(
+                            self._reducing_position_order["orderId"]
+                        )
+                        self._reducing_position_order = (
+                            self._broker.create_limit_sell_order(
+                                instrument_id=self._figi,
+                                price=stop_price,
+                                quantity=int(long_position["quantityLots"]["units"])
+                                - 1,
+                            )
                         )
 
             # Manage take profit order
