@@ -16,12 +16,9 @@ Example usage:
 import logging
 import os
 from typing import Dict, Optional, Union
-from dotenv import load_dotenv
 
 
 from .api import get_access_token
-
-load_dotenv()
 
 logger = logging.getLogger("AlorToken")
 

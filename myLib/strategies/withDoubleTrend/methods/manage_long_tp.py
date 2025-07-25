@@ -41,8 +41,9 @@ def manage_long_tp(
         return
 
     # Case 2: Have position - manage TP orders
-    take_profit_price = data.get("ST 10 3 UP")
-
+    take_profit_price = max(
+        data.get("EMA 50") + 1.5, positions.get("average_price") + 1.5
+    )
     # Find existing TP order if any
     existing_tp_order = next(
         (order for order in orders if order["signal"] == DoubleTrendSignals.LONG_TP),

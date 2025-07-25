@@ -18,7 +18,8 @@ def manage_long_sl(
         data: Market data containing stop-loss level ('ST 20 5 LOW' column)
         orders: List of current pending orders
     """
-    position_size = positions.get("size", 0)
+    position_size = positions.get("size")
+    avg_price = positions.get("average_price")
 
     # Helper function to create a new stop-loss order
     def create_new_sl_order(stop_loss_price: float) -> None:
@@ -41,7 +42,9 @@ def manage_long_sl(
         return
 
     # Case 2: Have position - manage SL orders
-    stop_loss_price = data.get("ST 20 5 LOW")
+    stop_loss_price = data.get("ST 10 3 LOW")
+    if avg_price * 1.0001 < data.get("LOW"):
+        stop_loss_price = round(avg_price * 1.0001, 2)
 
     # Find existing SL order if any
     existing_sl_order = next(
